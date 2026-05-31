@@ -1,0 +1,47 @@
+{
+  "_version": "1.58.0",
+  "sap.app": {
+    "id": "purchaseorders",
+    "type": "application",
+    "title": "Bestellungen verwalten",
+    "dataSources": {}
+  },
+  "sap.ui5": {
+    "rootView": {
+      "viewName": "purchaseorders.view.List",
+      "type": "XML",
+      "id": "app"
+    },
+    "models": {},
+    "routing": {
+      "config": {
+        "routerClass": "sap.m.routing.Router",
+        "viewPath": "purchaseorders.view",
+        "controlId": "app",
+        "controlAggregation": "pages"
+      },
+      "routes": [
+        {
+          "name": "list",
+          "pattern": "",
+          "target": "list"
+        },
+        {
+          "name": "detail",
+          "pattern": "order/{id}",
+          "target": "detail"
+        }
+      ],
+      "targets": {
+        "list": {
+          "viewName": "List",
+          "viewType": "XML"
+        },
+        "detail": {
+          "viewName": "Detail",
+          "viewType": "XML"
+        }
+      }
+    }
+  }
+}

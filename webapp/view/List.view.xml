@@ -1,0 +1,88 @@
+<mvc:View controllerName="purchaseorders.controller.List"
+  xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" displayBlock="true">
+  <App id="mainApp">
+    <pages>
+      <Page id="listPage" title="Bestellungen verwalten">
+        <content>
+          <Table id="ordersTable" items="{/orders}">
+            <headerToolbar>
+              <Toolbar>
+                <Title text="Bestellungen"/>
+                <ToolbarSpacer/>
+                <SearchField placeholder="Suchen..." search=".onSearch" width="20rem"/>
+              </Toolbar>
+            </headerToolbar>
+            <columns>
+              <Column><Text text="Bestellnummer"/></Column>
+              <Column><Text text="Lieferant"/></Column>
+              <Column><Text text="Status"/></Column>
+              <Column><Text text="Betrag"/></Column>
+            </columns>
+            <items>
+              <ColumnListItem type="Navigation" press=".onOrderPress">
+                <cells>
+                  <Text text="{id}"/>
+                  <Text text="{supplier}"/>
+                  <ObjectStatus text="{status}" state="{statusState}"/>
+                  <Text text="{amount}"/>
+                </cells>
+              </ColumnListItem>
+            </items>
+          </Table>
+        </content>
+      </Page>
+
+      <Page id="detailPage" title="{detail>/id}"
+        showNavButton="true" navButtonPress=".onNavBack">
+        <headerContent>
+          <Button id="btnApprove" text="Genehmigen" type="Accept" press=".onApprove" visible="{detail>/canAct}"/>
+          <Button id="btnReject"  text="Ablehnen"   type="Reject" press=".onReject"  visible="{detail>/canAct}"/>
+        </headerContent>
+        <content>
+          <VBox class="sapUiMediumMargin">
+            <Panel headerText="Allgemeine Informationen" class="sapUiMediumMarginBottom">
+              <content>
+                <VBox class="sapUiSmallMargin">
+                  <HBox class="sapUiSmallMarginBottom"><Label text="Lieferant:"    width="160px"/><Text text="{detail>/supplier}"/></HBox>
+                  <HBox class="sapUiSmallMarginBottom"><Label text="Kategorie:"    width="160px"/><Text text="{detail>/cat}"/></HBox>
+                  <HBox class="sapUiSmallMarginBottom"><Label text="Status:"       width="160px"/><ObjectStatus text="{detail>/status}" state="{detail>/statusState}"/></HBox>
+                  <HBox class="sapUiSmallMarginBottom"><Label text="Bestelldatum:" width="160px"/><Text text="{detail>/orderDate}"/></HBox>
+                  <HBox class="sapUiSmallMarginBottom"><Label text="Lieferdatum:"  width="160px"/><Text text="{detail>/delivDate}"/></HBox>
+                  <HBox class="sapUiSmallMarginBottom"><Label text="Einkäufer:"    width="160px"/><Text text="{detail>/buyer}"/></HBox>
+                  <HBox class="sapUiSmallMarginBottom"><Label text="Priorität:"    width="160px"/><Text text="{detail>/priority}"/></HBox>
+                  <HBox class="sapUiSmallMarginBottom"><Label text="Gesamtbetrag:" width="160px"/><Text text="{detail>/amount}"/></HBox>
+                </VBox>
+              </content>
+            </Panel>
+            <Panel headerText="Bestellpositionen">
+              <content>
+                <Table items="{detail>/positions}">
+                  <columns>
+                    <Column><Text text="Material-Nr."/></Column>
+                    <Column><Text text="Materialname"/></Column>
+                    <Column><Text text="Menge"/></Column>
+                    <Column><Text text="Einheit"/></Column>
+                    <Column><Text text="Einzelpreis"/></Column>
+                    <Column><Text text="Gesamt"/></Column>
+                  </columns>
+                  <items>
+                    <ColumnListItem>
+                      <cells>
+                        <Text text="{detail>mat}"/>
+                        <Text text="{detail>name}"/>
+                        <Text text="{detail>qty}"/>
+                        <Text text="{detail>unit}"/>
+                        <Text text="{detail>price}"/>
+                        <Text text="{detail>total}"/>
+                      </cells>
+                    </ColumnListItem>
+                  </items>
+                </Table>
+              </content>
+            </Panel>
+          </VBox>
+        </content>
+      </Page>
+    </pages>
+  </App>
+</mvc:View>

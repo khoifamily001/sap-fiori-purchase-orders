@@ -1,0 +1,97 @@
+<mvc:View
+  controllerName="purchaseorders.controller.Detail"
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns="sap.m"
+  xmlns:f="sap.f"
+  xmlns:form="sap.ui.layout.form"
+  displayBlock="true">
+
+  <Page
+    id="detailPage"
+    title="{viewModel>/selectedOrder/id}"
+    showNavButton="true"
+    navButtonPress=".onNavBack">
+
+    <headerContent>
+      <Button
+        text="Genehmigen"
+        type="Accept"
+        press=".onApprove"
+        visible="{viewModel>/canAct}"/>
+      <Button
+        text="Ablehnen"
+        type="Reject"
+        press=".onReject"
+        visible="{viewModel>/canAct}"
+        style="margin-left: 8px"/>
+    </headerContent>
+
+    <content>
+
+      <!-- General Info -->
+      <Panel headerText="Allgemeine Informationen" class="sapUiMediumMargin">
+        <content>
+          <form:SimpleForm editable="false" layout="ResponsiveGridLayout">
+            <form:content>
+              <Label text="Lieferant"/>
+              <Text text="{viewModel>/selectedOrder/supplier}"/>
+
+              <Label text="Kategorie"/>
+              <Text text="{viewModel>/selectedOrder/cat}"/>
+
+              <Label text="Status"/>
+              <ObjectStatus
+                text="{viewModel>/selectedOrder/status}"
+                state="{viewModel>/selectedOrder/statusState}"/>
+
+              <Label text="Bestelldatum"/>
+              <Text text="{viewModel>/selectedOrder/orderDate}"/>
+
+              <Label text="Lieferdatum"/>
+              <Text text="{viewModel>/selectedOrder/delivDate}"/>
+
+              <Label text="Einkäufer"/>
+              <Text text="{viewModel>/selectedOrder/buyer}"/>
+
+              <Label text="Priorität"/>
+              <Text text="{viewModel>/selectedOrder/priority}"/>
+
+              <Label text="Gesamtbetrag"/>
+              <Text text="{viewModel>/selectedOrder/amount}"/>
+            </form:content>
+          </form:SimpleForm>
+        </content>
+      </Panel>
+
+      <!-- Order Positions -->
+      <Panel headerText="Bestellpositionen" class="sapUiMediumMargin">
+        <content>
+          <Table items="{viewModel>/selectedOrder/positions}">
+            <columns>
+              <Column><Text text="Material-Nr."/></Column>
+              <Column><Text text="Materialname"/></Column>
+              <Column><Text text="Menge"/></Column>
+              <Column><Text text="Einheit"/></Column>
+              <Column><Text text="Einzelpreis"/></Column>
+              <Column><Text text="Gesamt"/></Column>
+            </columns>
+            <items>
+              <ColumnListItem>
+                <cells>
+                  <Text text="{viewModel>mat}"/>
+                  <Text text="{viewModel>name}"/>
+                  <Text text="{viewModel>qty}"/>
+                  <Text text="{viewModel>unit}"/>
+                  <Text text="{viewModel>price}"/>
+                  <Text text="{viewModel>total}"/>
+                </cells>
+              </ColumnListItem>
+            </items>
+          </Table>
+        </content>
+      </Panel>
+
+    </content>
+  </Page>
+
+</mvc:View>
