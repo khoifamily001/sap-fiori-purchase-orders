@@ -10,40 +10,46 @@
       <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop">
         <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
           <Button id="btnToggleFilter" text="Filter ausblenden" icon="sap-icon://filter"
-            type="Transparent" press=".onToggleFilter"/>
-          <Text id="txtFilterCount" text="" class="sapUiSmallMarginEnd"/>
+            type="Transparent" press=".onToggleFilter" />
+          <Text id="txtFilterCount" text="" class="sapUiSmallMarginEnd" />
         </HBox>
 
         <VBox id="filterPanel">
           <HBox wrap="Wrap" class="sapUiSmallMarginBottom">
             <VBox class="sapUiSmallMarginEnd" width="220px">
-              <Label text="Suche"/>
+              <Label text="Suche" />
               <SearchField id="searchField" placeholder="Bestellnummer, Lieferant..."
-                search=".onSearch" liveChange=".onLiveSearch" width="100%"/>
+                search=".onSearch" liveChange=".onLiveSearch" width="100%" />
             </VBox>
             <VBox class="sapUiSmallMarginEnd" width="200px">
-              <Label text="Status"/>
+              <Label text="Status" />
               <Select id="filterStatus" change=".onFilter" width="100%">
-                <core:Item key=""   text="Alle Status"/>
-                <core:Item key="01" text="Erstellt"/>
-                <core:Item key="02" text="Zur Genehmigung"/>
-                <core:Item key="03" text="Genehmigt"/>
-                <core:Item key="04" text="Abgelehnt"/>
-                <core:Item key="05" text="Abgeschlossen"/>
+                <core:Item key="" text="Alle Status" />
+                <core:Item key="01" text="Version in Arbeit" />
+                <core:Item key="02" text="Aktiv" />
+                <core:Item key="03" text="In Freigabe" />
+                <core:Item key="04" text="Freigabe teilweise" />
+                <core:Item key="05" text="Freigabe abgeschlossen" />
+                <core:Item key="08" text="Abgelehnt" />
+                <core:Item key="11" text="In Verteilung" />
+                <core:Item key="12" text="Fehler bei Verteilung" />
+                <core:Item key="13" text="Verteilt" />
+                <core:Item key="14" text="In Vorbereitung" />
+                <core:Item key="26" text="In externer Genehmigung" />
               </Select>
             </VBox>
             <VBox class="sapUiSmallMarginEnd" width="180px">
-              <Label text="Einkaufsorg."/>
+              <Label text="Einkaufsorg." />
               <Select id="filterPurchOrg" change=".onFilter" width="100%">
-                <core:Item key=""     text="Alle"/>
-                <core:Item key="1710" text="1710"/>
+                <core:Item key="" text="Alle" />
+                <core:Item key="1710" text="1710" />
               </Select>
             </VBox>
             <VBox width="180px">
-              <Label text="Buchungskreis"/>
+              <Label text="Buchungskreis" />
               <Select id="filterCompany" change=".onFilter" width="100%">
-                <core:Item key=""     text="Alle"/>
-                <core:Item key="1710" text="1710"/>
+                <core:Item key="" text="Alle" />
+                <core:Item key="1710" text="1710" />
               </Select>
             </VBox>
           </HBox>
@@ -51,7 +57,7 @@
 
         <HBox class="sapUiSmallMarginBottom">
           <Button text="Exportieren" icon="sap-icon://download"
-            press=".onExportPress"/>
+            press=".onExportPress" />
         </HBox>
       </VBox>
 
@@ -62,28 +68,47 @@
         growingScrollToLoad="false"
         updateFinished=".onTableUpdateFinished">
         <columns>
-          <Column width="150px"><Text text="Bestellnummer"/></Column>
-          <Column><Text text="Lieferant"/></Column>
-          <Column width="130px"><Text text="Bestelldatum"/></Column>
-          <Column width="130px"><Text text="Erstellt am"/></Column>
-          <Column width="160px"><Text text="Status"/></Column>
-          <Column width="110px"><Text text="Einkaufsorg."/></Column>
-          <Column width="110px"><Text text="Buchungskreis"/></Column>
-          <Column width="140px" hAlign="End"><Text text="Gesamtbetrag"/></Column>
+          <Column width="150px">
+            <Text text="Bestellnummer" />
+          </Column>
+          <Column>
+            <Text text="Lieferant" />
+          </Column>
+          <Column width="130px">
+            <Text text="Bestelldatum" />
+          </Column>
+          <Column width="130px">
+            <Text text="Erstellt am" />
+          </Column>
+          <Column width="160px">
+            <Text text="Status" />
+          </Column>
+          <Column width="110px">
+            <Text text="Einkaufsorg." />
+          </Column>
+          <Column width="110px">
+            <Text text="Buchungskreis" />
+          </Column>
+          <Column width="140px" hAlign="End">
+            <Text text="Gesamtbetrag" />
+          </Column>
         </columns>
         <items>
           <ColumnListItem type="Navigation" press=".onOrderPress">
             <cells>
-              <Text text="{PurchaseOrder}"/>
-              <Text text="{Supplier}"/>
-              <Text text="{path: 'PurchaseOrderDate', type: 'sap.ui.model.type.Date', formatOptions: {style: 'medium', UTC: true}}"/>
-              <Text text="{path: 'CreationDate', type: 'sap.ui.model.type.Date', formatOptions: {style: 'medium', UTC: true}}"/>
+              <Text text="{PurchaseOrder}" />
+              <Text text="{Supplier}" />
+              <Text
+                text="{path: 'PurchaseOrderDate', type: 'sap.ui.model.type.Date', formatOptions: {style: 'medium', UTC: true}}" />
+              <Text
+                text="{path: 'CreationDate', type: 'sap.ui.model.type.Date', formatOptions: {style: 'medium', UTC: true}}" />
               <ObjectStatus
                 text="{path: 'PurchasingProcessingStatus', formatter: '.formatStatusText'}"
-                state="{path: 'PurchasingProcessingStatus', formatter: '.formatStatusState'}"/>
-              <Text text="{PurchasingOrganization}"/>
-              <Text text="{CompanyCode}"/>
-              <Text text="{parts: [{path: 'PurgReleaseTimeTotalAmount'},{path: 'DocumentCurrency'}], formatter: '.formatAmount'}"/>
+                state="{path: 'PurchasingProcessingStatus', formatter: '.formatStatusState'}" />
+              <Text text="{PurchasingOrganization}" />
+              <Text text="{CompanyCode}" />
+              <Text
+                text="{parts: [{path: 'PurgReleaseTimeTotalAmount'},{path: 'DocumentCurrency'}], formatter: '.formatAmount'}" />
             </cells>
           </ColumnListItem>
         </items>
