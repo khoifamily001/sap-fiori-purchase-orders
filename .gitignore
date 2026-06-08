@@ -1,10 +1,24 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
 .scp/
-.env
-Makefile*.mta
-mta_archives
-mta-*
-resources
+resources/
 archive.zip
+mta_archives/
+mta-*
+Makefile*.mta
 .*_mta_build_tmp
+
+# Local UI5 tooling config
+ui5.yaml
+ui5-local.yaml
+package.json
+package-lock.json
+
+# Editor
+.vscode/
+
+# Environment
+.env
