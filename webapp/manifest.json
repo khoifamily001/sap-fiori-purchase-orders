@@ -1,47 +1,78 @@
 {
-  "_version": "1.58.0",
-  "sap.app": {
-    "id": "purchaseorders",
-    "type": "application",
-    "title": "Bestellungen verwalten",
-    "dataSources": {}
-  },
-  "sap.ui5": {
-    "rootView": {
-      "viewName": "purchaseorders.view.List",
-      "type": "XML",
-      "id": "app"
+    "_version": "1.58.0",
+    "sap.app": {
+        "id": "purchaseorders",
+        "type": "application",
+        "title": "{{appTitle}}",
+        "dataSources": {
+            "mainService": {
+                "uri": "/sap/opu/odata/sap/ZOSO_PURCHASEORDER_UI_O2/",
+                "type": "OData",
+                "settings": {
+                    "odataVersion": "2.0"
+                }
+            }
+        },
+        "sourceTemplate": {
+            "id": "@sap/ux-app-migrator:freestyle",
+            "version": "1.20.3",
+            "toolsId": "5f455319-4f45-431e-9af2-651372c718d5"
+        }
     },
-    "models": {},
-    "routing": {
-      "config": {
-        "routerClass": "sap.m.routing.Router",
-        "viewPath": "purchaseorders.view",
-        "controlId": "app",
-        "controlAggregation": "pages"
-      },
-      "routes": [
-        {
-          "name": "list",
-          "pattern": "",
-          "target": "list"
+    "sap.ui5": {
+        "rootView": {
+            "viewName": "purchaseorders.view.App",
+            "type": "XML",
+            "id": "app"
         },
-        {
-          "name": "detail",
-          "pattern": "order/{id}",
-          "target": "detail"
-        }
-      ],
-      "targets": {
-        "list": {
-          "viewName": "List",
-          "viewType": "XML"
+        "models": {
+            "": {
+                "dataSource": "mainService",
+                "preload": true,
+                "settings": {
+                    "useBatch": false
+                }
+            },
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "purchaseorders.i18n.i18n",
+                    "supportedLocales": [
+                        ""
+                    ],
+                    "fallbackLocale": ""
+                }
+            }
         },
-        "detail": {
-          "viewName": "Detail",
-          "viewType": "XML"
+        "routing": {
+            "config": {
+                "routerClass": "sap.m.routing.Router",
+                "viewPath": "purchaseorders.view",
+                "controlId": "app",
+                "controlAggregation": "pages"
+            },
+            "routes": [
+                {
+                    "name": "list",
+                    "pattern": "",
+                    "target": "list"
+                },
+                {
+                    "name": "detail",
+                    "pattern": "order/{id}",
+                    "target": "detail"
+                }
+            ],
+            "targets": {
+                "list": {
+                    "viewName": "List",
+                    "viewType": "XML"
+                },
+                "detail": {
+                    "viewName": "Detail",
+                    "viewType": "XML"
+                }
+            }
         }
-      }
     }
-  }
 }

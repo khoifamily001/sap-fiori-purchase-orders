@@ -1,85 +1,112 @@
-sap.ui.define([
-  "sap/ui/core/mvc/Controller",
-  "sap/ui/model/json/JSONModel",
-  "sap/m/MessageToast",
-  "sap/m/MessageBox"
-], function (Controller, JSONModel, MessageToast, MessageBox) {
-  "use strict";
+sap.ui.define(
+  [
+    "sap/ui/core/mvc/Controller",
+    "sap/ui/model/json/JSONModel",
+    "sap/m/MessageToast",
+    "sap/m/MessageBox",
+  ],
+  function (Controller, JSONModel, MessageToast, MessageBox) {
+    "use strict";
 
-  return Controller.extend("purchaseorders.controller.Detail", {
+    return Controller.extend("purchaseorders.controller.Detail", {
+      onInit: function () {
+        this.getView().setModel(new JSONModel({ canAct: false }), "viewModel");
 
-    onInit: function () {
-      var oRouter = this.getOwnerComponent().getRouter();
-      oRouter.getRoute("detail").attachPatternMatched(this._onRouteMatched, this);
-    },
+        var oRouter = this.getOwnerComponent().getRouter();
+        oRouter
+          .getRoute("detail")
+          .attachPatternMatched(this._onRouteMatched, this);
+      },
 
-    _onRouteMatched: function (oEvent) {
-      var sId = oEvent.getParameter("arguments").id;
+      _onRouteMatched: function (oEvent) {
+        var sId = oEvent.getParameter("arguments").id;
+        var sPath = "/ZOSO_C_PurchaseOrder('" + sId + "')";
 
-      // Get the order from the List model
-      var oListModel = this.getOwnerComponent().getModel("orders");
-      var aOrders = oListModel.getProperty("/orders");
-      var oOrder = aOrders.find(function(o) { return o.id === sId; });
+        this.getView().bindElement({
+          path: sPath,
+          events: {
+            change: function () {
+              var oCtx = this.getView().getBindingContext();
+              if (!oCtx) {
+                MessageToast.show("Bestellung nicht gefunden!");
+                return;
+              }
 
-      if (!oOrder) {
-        MessageToast.show("Bestellung nicht gefunden!");
-        return;
-      }
+              var sStatus = oCtx.getProperty("PurchasingProcessingStatus");
 
-      // Set view model
-      var oViewModel = new JSONModel({
-        selectedOrder: oOrder,
-        canAct: oOrder.status === "Offen" || oOrder.status === "In Bearbeitung"
-      });
-      this.getView().setModel(oViewModel, "viewModel");
-    },
+              var bCanAct = sStatus === "02";
 
-    onNavBack: function () {
-      this.getOwnerComponent().getRouter().navTo("list");
-    },
+              this.getView()
+                .getModel("viewModel")
+                .setProperty("/canAct", bCanAct);
+            }.bind(this),
 
-    onApprove: function () {
-      MessageBox.confirm("Möchten Sie diese Bestellung wirklich genehmigen?", {
-        title: "Genehmigen bestätigen",
-        onClose: function (sAction) {
-          if (sAction === MessageBox.Action.OK) {
-            this._updateStatus("Genehmigt", "Success");
-            MessageToast.show("✅ Bestellung wurde genehmigt!");
-          }
-        }.bind(this)
-      });
-    },
+            dataRequested: function () {
+              // Reset buttons while loading
+              this.getView()
+                .getModel("viewModel")
+                .setProperty("/canAct", false);
+            }.bind(this),
+          },
+        });
+      },
 
-    onReject: function () {
-      MessageBox.confirm("Möchten Sie diese Bestellung wirklich ablehnen?", {
-        title: "Ablehnen bestätigen",
-        onClose: function (sAction) {
-          if (sAction === MessageBox.Action.OK) {
-            this._updateStatus("Abgelehnt", "Error");
-            MessageToast.show("❌ Bestellung wurde abgelehnt!");
-          }
-        }.bind(this)
-      });
-    },
+      onNavBack: function () {
+        this.getOwnerComponent().getRouter().navTo("list");
+      },
 
-    _updateStatus: function (sStatus, sState) {
-      var oViewModel = this.getView().getModel("viewModel");
+      onApprove: function () {
+        MessageBox.confirm(
+          "Möchten Sie diese Bestellung wirklich genehmigen?",
+          {
+            title: "Genehmigen bestätigen",
+            onClose: function (sAction) {
+              if (sAction === MessageBox.Action.OK) {
+                this._updateStatus("approve");
+              }
+            }.bind(this),
+          },
+        );
+      },
 
-      // Update detail view
-      oViewModel.setProperty("/selectedOrder/status", sStatus);
-      oViewModel.setProperty("/selectedOrder/statusState", sState);
-      oViewModel.setProperty("/canAct", false);
+      onReject: function () {
+        MessageBox.confirm("Möchten Sie diese Bestellung wirklich ablehnen?", {
+          title: "Ablehnen bestätigen",
+          onClose: function (sAction) {
+            if (sAction === MessageBox.Action.OK) {
+              this._updateStatus("reject");
+            }
+          }.bind(this),
+        });
+      },
 
-      // Update the list model too so it reflects when going back
-      var sId = oViewModel.getProperty("/selectedOrder/id");
-      var oListModel = this.getOwnerComponent().getModel("orders");
-      var aOrders = oListModel.getProperty("/orders");
-      var iIndex = aOrders.findIndex(function(o) { return o.id === sId; });
-      if (iIndex > -1) {
-        oListModel.setProperty("/orders/" + iIndex + "/status", sStatus);
-        oListModel.setProperty("/orders/" + iIndex + "/statusState", sState);
-      }
-    }
+      _updateStatus: function (sAction) {
+        var oView = this.getView();
+        var sPO = oView.getBindingContext().getProperty("PurchaseOrder");
 
-  });
-});
+        var sTitle =
+          sAction === "approve" ? "Genehmigung gesendet" : "Ablehnung gesendet";
+        var sMsg =
+          sAction === "approve"
+            ? "Die Bestellung " +
+              sPO +
+              " wurde zur Genehmigung an das System übermittelt.\nSie wird in Kürze verarbeitet."
+            : "Die Bestellung " +
+              sPO +
+              " wurde zur Ablehnung an das System übermittelt.\nSie wird in Kürze verarbeitet.";
+
+        MessageBox.information(sMsg, {
+          title: sTitle,
+          icon:
+            sAction === "approve"
+              ? MessageBox.Icon.SUCCESS
+              : MessageBox.Icon.WARNING,
+          onClose: function () {
+            // Disable buttons after action
+            oView.getModel("viewModel").setProperty("/canAct", false);
+          },
+        });
+      },
+    });
+  },
+);
