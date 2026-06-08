@@ -1,28 +1,102 @@
 <mvc:View controllerName="purchaseorders.controller.List"
-  xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" displayBlock="true">
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns:core="sap.ui.core"
+  xmlns="sap.m" displayBlock="true">
   <App id="mainApp">
     <pages>
+
+      <!-- LIST PAGE -->
       <Page id="listPage" title="Bestellungen verwalten">
         <content>
-          <Table id="ordersTable" items="{/orders}">
-            <headerToolbar>
-              <Toolbar>
-                <Title text="Bestellungen"/>
-                <ToolbarSpacer/>
-                <SearchField placeholder="Suchen..." search=".onSearch" width="20rem"/>
-              </Toolbar>
-            </headerToolbar>
+          <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop">
+            <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
+              <Button id="btnToggleFilter" text="Filter ausblenden" icon="sap-icon://filter"
+                type="Transparent" press=".onToggleFilter"/>
+              <Text id="txtFilterCount" text="8 von 8 Bestellungen" class="sapUiSmallMarginEnd"/>
+            </HBox>
+            <VBox id="filterPanel">
+              <HBox wrap="Wrap" class="sapUiSmallMarginBottom">
+                <VBox class="sapUiSmallMarginEnd" width="220px">
+                  <Label text="Suche"/>
+                  <SearchField id="searchField" placeholder="Bestellnummer, Lieferant..."
+                    search=".onSearch" liveChange=".onLiveSearch" width="100%"/>
+                </VBox>
+                <VBox class="sapUiSmallMarginEnd" width="180px">
+                  <Label text="Status"/>
+                  <Select id="filterStatus" change=".onFilter" width="100%">
+                    <core:Item key="" text="Alle Status"/>
+                    <core:Item key="Offen" text="Offen"/>
+                    <core:Item key="In Bearbeitung" text="In Bearbeitung"/>
+                    <core:Item key="Genehmigt" text="Genehmigt"/>
+                    <core:Item key="Abgelehnt" text="Abgelehnt"/>
+                    <core:Item key="Abgeschlossen" text="Abgeschlossen"/>
+                  </Select>
+                </VBox>
+                <VBox class="sapUiSmallMarginEnd" width="180px">
+                  <Label text="Kategorie"/>
+                  <Select id="filterKategorie" change=".onFilter" width="100%">
+                    <core:Item key="" text="Alle Kategorien"/>
+                    <core:Item key="Rohstoffe" text="Rohstoffe"/>
+                    <core:Item key="Büromaterial" text="Büromaterial"/>
+                    <core:Item key="IT-Equipment" text="IT-Equipment"/>
+                    <core:Item key="Werkzeuge" text="Werkzeuge"/>
+                    <core:Item key="Verpackungsmaterial" text="Verpackungsmaterial"/>
+                    <core:Item key="Ersatzteile" text="Ersatzteile"/>
+                  </Select>
+                </VBox>
+                <VBox class="sapUiSmallMarginEnd" width="180px">
+                  <Label text="Lieferant"/>
+                  <Select id="filterLieferant" change=".onFilter" width="100%">
+                    <core:Item key="" text="Alle Lieferanten"/>
+                    <core:Item key="Hoffmann Materials" text="Hoffmann Materials"/>
+                    <core:Item key="Becker Supplies" text="Becker Supplies"/>
+                    <core:Item key="Fischer Industries" text="Fischer Industries"/>
+                    <core:Item key="Weber &amp; Co." text="Weber &amp; Co."/>
+                    <core:Item key="Müller AG" text="Müller AG"/>
+                    <core:Item key="Schmidt GmbH" text="Schmidt GmbH"/>
+                    <core:Item key="Koch Trading" text="Koch Trading"/>
+                    <core:Item key="Bauer Logistics" text="Bauer Logistics"/>
+                  </Select>
+                </VBox>
+                <VBox width="180px">
+                  <Label text="Einkäufer"/>
+                  <Select id="filterEinkaeufer" change=".onFilter" width="100%">
+                    <core:Item key="" text="Alle Einkäufer"/>
+                    <core:Item key="Anna Schmidt" text="Anna Schmidt"/>
+                    <core:Item key="Thomas Müller" text="Thomas Müller"/>
+                    <core:Item key="Sarah Weber" text="Sarah Weber"/>
+                    <core:Item key="Michael Fischer" text="Michael Fischer"/>
+                    <core:Item key="Julia Becker" text="Julia Becker"/>
+                  </Select>
+                </VBox>
+              </HBox>
+            </VBox>
+            <HBox class="sapUiSmallMarginBottom">
+              <Button text="Erstellen" icon="sap-icon://add" type="Emphasized"
+                press=".onCreatePress" class="sapUiSmallMarginEnd"/>
+              <Button text="Löschen" icon="sap-icon://delete"
+                press=".onDeletePress" class="sapUiSmallMarginEnd"/>
+              <Button text="Exportieren" icon="sap-icon://download" press=".onExportPress"/>
+            </HBox>
+          </VBox>
+
+          <Table id="ordersTable" items="{/orders}" mode="MultiSelect"
+            growing="true" growingThreshold="20">
             <columns>
-              <Column><Text text="Bestellnummer"/></Column>
+              <Column width="160px"><Text text="Bestellnummer"/></Column>
               <Column><Text text="Lieferant"/></Column>
-              <Column><Text text="Status"/></Column>
-              <Column><Text text="Betrag"/></Column>
+              <Column width="120px"><Text text="Bestelldatum"/></Column>
+              <Column width="120px"><Text text="Lieferdatum"/></Column>
+              <Column width="140px"><Text text="Status"/></Column>
+              <Column width="140px" hAlign="End"><Text text="Gesamtbetrag"/></Column>
             </columns>
             <items>
               <ColumnListItem type="Navigation" press=".onOrderPress">
                 <cells>
                   <Text text="{id}"/>
                   <Text text="{supplier}"/>
+                  <Text text="{orderDate}"/>
+                  <Text text="{delivDate}"/>
                   <ObjectStatus text="{status}" state="{statusState}"/>
                   <Text text="{amount}"/>
                 </cells>
@@ -32,11 +106,14 @@
         </content>
       </Page>
 
+      <!-- DETAIL PAGE -->
       <Page id="detailPage" title="{detail>/id}"
         showNavButton="true" navButtonPress=".onNavBack">
         <headerContent>
-          <Button id="btnApprove" text="Genehmigen" type="Accept" press=".onApprove" visible="{detail>/canAct}"/>
-          <Button id="btnReject"  text="Ablehnen"   type="Reject" press=".onReject"  visible="{detail>/canAct}"/>
+          <Button id="btnApprove" text="Genehmigen" type="Accept"
+            press=".onApprove" visible="{detail>/canAct}"/>
+          <Button id="btnReject" text="Ablehnen" type="Reject"
+            press=".onReject" visible="{detail>/canAct}"/>
         </headerContent>
         <content>
           <VBox class="sapUiMediumMargin">
@@ -83,6 +160,141 @@
           </VBox>
         </content>
       </Page>
+
+      <!-- CREATE PAGE -->
+      <Page id="createPage" title="Bestellung erstellen"
+        showNavButton="true" navButtonPress=".onCancelCreate">
+        <content>
+          <VBox class="sapUiMediumMargin">
+
+            <Panel headerText="Allgemeine Informationen" class="sapUiMediumMarginBottom">
+              <content>
+                <VBox class="sapUiSmallMargin">
+                  <HBox wrap="Wrap">
+                    <VBox width="48%" class="sapUiMediumMarginEnd">
+                      <Label text="Lieferant" required="true"/>
+                      <Select selectedKey="{create>/lieferant}" width="100%" class="sapUiSmallMarginBottom">
+                        <core:Item key="" text="Bitte wählen..."/>
+                        <core:Item key="Hoffmann Materials" text="Hoffmann Materials"/>
+                        <core:Item key="Becker Supplies" text="Becker Supplies"/>
+                        <core:Item key="Fischer Industries" text="Fischer Industries"/>
+                        <core:Item key="Weber &amp; Co." text="Weber &amp; Co."/>
+                        <core:Item key="Müller AG" text="Müller AG"/>
+                        <core:Item key="Schmidt GmbH" text="Schmidt GmbH"/>
+                        <core:Item key="Koch Trading" text="Koch Trading"/>
+                        <core:Item key="Bauer Logistics" text="Bauer Logistics"/>
+                      </Select>
+                      <Label text="Bestelldatum" required="true"/>
+                      <DatePicker value="{create>/bestelldatum}" width="100%" class="sapUiSmallMarginBottom"
+                        valueFormat="dd.MM.yyyy" displayFormat="dd.MM.yyyy"/>
+                      <Label text="Priorität"/>
+                      <Select selectedKey="{create>/prioritaet}" width="100%" class="sapUiSmallMarginBottom">
+                        <core:Item key="Niedrig" text="Niedrig"/>
+                        <core:Item key="Mittel" text="Mittel"/>
+                        <core:Item key="Hoch" text="Hoch"/>
+                      </Select>
+                      <Label text="Zahlungsbedingungen"/>
+                      <Select selectedKey="{create>/zahlung}" width="100%">
+                        <core:Item key="Netto 30 Tage" text="Netto 30 Tage"/>
+                        <core:Item key="Netto 14 Tage" text="Netto 14 Tage"/>
+                        <core:Item key="Sofort" text="Sofort"/>
+                      </Select>
+                    </VBox>
+                    <VBox width="48%">
+                      <Label text="Kategorie" required="true"/>
+                      <Select selectedKey="{create>/kategorie}" width="100%" class="sapUiSmallMarginBottom">
+                        <core:Item key="" text="Bitte wählen..."/>
+                        <core:Item key="Rohstoffe" text="Rohstoffe"/>
+                        <core:Item key="Büromaterial" text="Büromaterial"/>
+                        <core:Item key="IT-Equipment" text="IT-Equipment"/>
+                        <core:Item key="Werkzeuge" text="Werkzeuge"/>
+                        <core:Item key="Verpackungsmaterial" text="Verpackungsmaterial"/>
+                        <core:Item key="Ersatzteile" text="Ersatzteile"/>
+                      </Select>
+                      <Label text="Lieferdatum" required="true"/>
+                      <DatePicker value="{create>/lieferdatum}" width="100%" class="sapUiSmallMarginBottom"
+                        valueFormat="dd.MM.yyyy" displayFormat="dd.MM.yyyy"/>
+                      <Label text="Einkäufer" required="true"/>
+                      <Select selectedKey="{create>/einkaeufer}" width="100%">
+                        <core:Item key="" text="Bitte wählen..."/>
+                        <core:Item key="Anna Schmidt" text="Anna Schmidt"/>
+                        <core:Item key="Thomas Müller" text="Thomas Müller"/>
+                        <core:Item key="Sarah Weber" text="Sarah Weber"/>
+                        <core:Item key="Michael Fischer" text="Michael Fischer"/>
+                        <core:Item key="Julia Becker" text="Julia Becker"/>
+                      </Select>
+                    </VBox>
+                  </HBox>
+                  <VBox class="sapUiSmallMarginTop">
+                    <Label text="Lieferadresse" required="true"/>
+                    <Input value="{create>/lieferadresse}" width="100%" class="sapUiSmallMarginBottom"
+                      placeholder="z.B. Hauptlager, Industriestraße 12, 80331 München"/>
+                    <Label text="Bemerkungen"/>
+                    <TextArea value="{create>/bemerkungen}" width="100%" rows="3"
+                      placeholder="Optional: Zusätzliche Hinweise zur Bestellung"/>
+                  </VBox>
+                </VBox>
+              </content>
+            </Panel>
+
+            <Panel class="sapUiMediumMarginBottom">
+              <headerToolbar>
+                <Toolbar>
+                  <Title text="Bestellpositionen"/>
+                  <ToolbarSpacer/>
+                  <Button text="Position hinzufügen" icon="sap-icon://add"
+                    type="Emphasized" press=".onAddPosition"/>
+                </Toolbar>
+              </headerToolbar>
+              <content>
+                <Table items="{create>/positions}">
+                  <columns>
+                    <Column><Text text="Material-Nr."/></Column>
+                    <Column><Text text="Materialname"/></Column>
+                    <Column width="100px"><Text text="Menge"/></Column>
+                    <Column width="100px"><Text text="Einheit"/></Column>
+                    <Column width="120px"><Text text="Einzelpreis (€)"/></Column>
+                    <Column width="50px"><Text text=""/></Column>
+                  </columns>
+                  <items>
+                    <ColumnListItem>
+                      <cells>
+                        <Input value="{create>mat}" placeholder="MAT-1001"/>
+                        <Input value="{create>name}" placeholder="z.B. Stahl Blech 2mm"/>
+                        <Input value="{create>qty}" type="Number" change=".onPositionChange" placeholder="0"/>
+                        <Select selectedKey="{create>unit}" width="100%">
+                          <core:Item key="Stk" text="Stk"/>
+                          <core:Item key="kg" text="kg"/>
+                          <core:Item key="m" text="m"/>
+                          <core:Item key="Pack" text="Pack"/>
+                          <core:Item key="Set" text="Set"/>
+                          <core:Item key="Rolle" text="Rolle"/>
+                          <core:Item key="Box" text="Box"/>
+                        </Select>
+                        <Input value="{create>price}" type="Number" change=".onPositionChange" placeholder="0.00"/>
+                        <Button icon="sap-icon://delete" type="Transparent" press=".onRemovePosition"/>
+                      </cells>
+                    </ColumnListItem>
+                  </items>
+                </Table>
+                <HBox justifyContent="End" class="sapUiSmallMarginTop sapUiSmallMarginEnd">
+                  <Label text="Gesamtbetrag:" class="sapUiSmallMarginEnd"/>
+                  <Text text="{create>/gesamtbetrag}"/>
+                </HBox>
+              </content>
+            </Panel>
+
+            <HBox justifyContent="End">
+              <Button text="Abbrechen" icon="sap-icon://decline"
+                press=".onCancelCreate" class="sapUiSmallMarginEnd"/>
+              <Button text="Speichern" icon="sap-icon://save"
+                type="Emphasized" press=".onSaveCreate"/>
+            </HBox>
+
+          </VBox>
+        </content>
+      </Page>
+
     </pages>
   </App>
 </mvc:View>
