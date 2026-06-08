@@ -1,34 +1,94 @@
 <mvc:View controllerName="purchaseorders.controller.List"
-  xmlns:mvc="sap.ui.core.mvc" xmlns="sap.m" displayBlock="true">
+  xmlns:mvc="sap.ui.core.mvc"
+  xmlns:core="sap.ui.core"
+  xmlns="sap.m"
+  displayBlock="true">
 
   <Page id="listPage" title="Bestellungen verwalten">
     <content>
-      <Table id="ordersTable" items="{/ZOSO_C_PurchaseOrder}"
-        growing="true" growingThreshold="15" growingScrollToLoad="false">
-        <headerToolbar>
-          <Toolbar>
-            <Title text="Bestellungen" />
-            <ToolbarSpacer />
-            <SearchField placeholder="Suchen..." search=".onSearch" width="20rem" />
-          </Toolbar>
-        </headerToolbar>
+
+      <VBox class="sapUiSmallMarginBegin sapUiSmallMarginEnd sapUiSmallMarginTop">
+        <HBox justifyContent="SpaceBetween" alignItems="Center" class="sapUiSmallMarginBottom">
+          <Button id="btnToggleFilter" text="Filter ausblenden" icon="sap-icon://filter"
+            type="Transparent" press=".onToggleFilter"/>
+          <Text id="txtFilterCount" text="" class="sapUiSmallMarginEnd"/>
+        </HBox>
+
+        <VBox id="filterPanel">
+          <HBox wrap="Wrap" class="sapUiSmallMarginBottom">
+            <VBox class="sapUiSmallMarginEnd" width="220px">
+              <Label text="Suche"/>
+              <SearchField id="searchField" placeholder="Bestellnummer, Lieferant..."
+                search=".onSearch" liveChange=".onLiveSearch" width="100%"/>
+            </VBox>
+            <VBox class="sapUiSmallMarginEnd" width="200px">
+              <Label text="Status"/>
+              <Select id="filterStatus" change=".onFilter" width="100%">
+                <core:Item key=""   text="Alle Status"/>
+                <core:Item key="01" text="Erstellt"/>
+                <core:Item key="02" text="Zur Genehmigung"/>
+                <core:Item key="03" text="Genehmigt"/>
+                <core:Item key="04" text="Abgelehnt"/>
+                <core:Item key="05" text="Abgeschlossen"/>
+              </Select>
+            </VBox>
+            <VBox class="sapUiSmallMarginEnd" width="180px">
+              <Label text="Einkaufsorg."/>
+              <Select id="filterPurchOrg" change=".onFilter" width="100%">
+                <core:Item key=""     text="Alle"/>
+                <core:Item key="1710" text="1710"/>
+              </Select>
+            </VBox>
+            <VBox width="180px">
+              <Label text="Buchungskreis"/>
+              <Select id="filterCompany" change=".onFilter" width="100%">
+                <core:Item key=""     text="Alle"/>
+                <core:Item key="1710" text="1710"/>
+              </Select>
+            </VBox>
+          </HBox>
+        </VBox>
+
+        <HBox class="sapUiSmallMarginBottom">
+          <Button text="Exportieren" icon="sap-icon://download"
+            press=".onExportPress"/>
+        </HBox>
+      </VBox>
+
+      <Table id="ordersTable"
+        items="{/ZOSO_C_PurchaseOrder}"
+        growing="true"
+        growingThreshold="20"
+        growingScrollToLoad="false"
+        updateFinished=".onTableUpdateFinished">
         <columns>
-          <Column><Text text="Bestellnummer" /></Column>
-          <Column><Text text="Lieferant" /></Column>
-          <Column><Text text="Status" /></Column>
-          <Column><Text text="Betrag" /></Column>
+          <Column width="150px"><Text text="Bestellnummer"/></Column>
+          <Column><Text text="Lieferant"/></Column>
+          <Column width="130px"><Text text="Bestelldatum"/></Column>
+          <Column width="130px"><Text text="Erstellt am"/></Column>
+          <Column width="160px"><Text text="Status"/></Column>
+          <Column width="110px"><Text text="Einkaufsorg."/></Column>
+          <Column width="110px"><Text text="Buchungskreis"/></Column>
+          <Column width="140px" hAlign="End"><Text text="Gesamtbetrag"/></Column>
         </columns>
         <items>
           <ColumnListItem type="Navigation" press=".onOrderPress">
             <cells>
-              <Text text="{PurchaseOrder}" />
-              <Text text="{Supplier}" />
-              <ObjectStatus text="{PurchasingProcessingStatus}" />
-              <Text text="{amount}" />
+              <Text text="{PurchaseOrder}"/>
+              <Text text="{Supplier}"/>
+              <Text text="{path: 'PurchaseOrderDate', type: 'sap.ui.model.type.Date', formatOptions: {style: 'medium', UTC: true}}"/>
+              <Text text="{path: 'CreationDate', type: 'sap.ui.model.type.Date', formatOptions: {style: 'medium', UTC: true}}"/>
+              <ObjectStatus
+                text="{path: 'PurchasingProcessingStatus', formatter: '.formatStatusText'}"
+                state="{path: 'PurchasingProcessingStatus', formatter: '.formatStatusState'}"/>
+              <Text text="{PurchasingOrganization}"/>
+              <Text text="{CompanyCode}"/>
+              <Text text="{parts: [{path: 'PurgReleaseTimeTotalAmount'},{path: 'DocumentCurrency'}], formatter: '.formatAmount'}"/>
             </cells>
           </ColumnListItem>
         </items>
       </Table>
+
     </content>
   </Page>
 

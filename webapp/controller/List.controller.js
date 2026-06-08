@@ -1,40 +1,122 @@
 sap.ui.define([
   "sap/ui/core/mvc/Controller",
   "sap/ui/model/Filter",
-  "sap/ui/model/FilterOperator"
-], function (Controller, Filter, FilterOperator) {
+  "sap/ui/model/FilterOperator",
+  "sap/m/MessageToast"
+], function (Controller, Filter, FilterOperator, MessageToast) {
   "use strict";
+
+  var STATUS_TEXT = {
+    "01": "Erstellt",
+    "02": "Zur Genehmigung",
+    "03": "Genehmigt",
+    "04": "Abgelehnt",
+    "05": "Abgeschlossen"
+  };
+
+  var STATUS_STATE = {
+    "01": "None",
+    "02": "Warning",
+    "03": "Success",
+    "04": "Error",
+    "05": "None"
+  };
 
   return Controller.extend("purchaseorders.controller.List", {
 
     onInit: function () {
-      // Nothing needed here anymore — no detail model on this view
+      this._filterVisible = true;
     },
 
-    onSearch: function (oEvent) {
-      var sQuery = oEvent.getParameter("query");
-      var oBinding = this.byId("ordersTable").getBinding("items");
+    formatStatusText: function (sCode) {
+      return STATUS_TEXT[sCode] || sCode || "–";
+    },
+
+    formatStatusState: function (sCode) {
+      return STATUS_STATE[sCode] || "None";
+    },
+
+    formatAmount: function (sAmount, sCurrency) {
+      if (!sAmount) { return "–"; }
+      var fVal = parseFloat(sAmount);
+      if (isNaN(fVal)) { return sAmount; }
+      return fVal.toLocaleString("de-DE", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }) + " " + (sCurrency || "");
+    },
+
+    onTableUpdateFinished: function (oEvent) {
+      var iTotal  = oEvent.getParameter("total");
+      var iActual = oEvent.getParameter("actual");
+      this.byId("txtFilterCount").setText(iActual + " von " + iTotal + " Bestellungen");
+    },
+
+    onToggleFilter: function () {
+      this._filterVisible = !this._filterVisible;
+      this.byId("filterPanel").setVisible(this._filterVisible);
+      this.byId("btnToggleFilter").setText(
+        this._filterVisible ? "Filter ausblenden" : "Filter einblenden"
+      );
+    },
+
+    onLiveSearch: function () { this._applyFilters(); },
+    onSearch:     function () { this._applyFilters(); },
+    onFilter:     function () { this._applyFilters(); },
+
+    _applyFilters: function () {
+      var sSearch   = this.byId("searchField").getValue().trim();
+      var sStatus   = this.byId("filterStatus").getSelectedKey();
+      var sPurchOrg = this.byId("filterPurchOrg").getSelectedKey();
+      var sCompany  = this.byId("filterCompany").getSelectedKey();
+
       var aFilters = [];
-      if (sQuery && sQuery.trim().length > 0) {
+
+      if (sSearch) {
         aFilters.push(new Filter({
           filters: [
-            new Filter("PurchaseOrder", FilterOperator.Contains, sQuery),
-            new Filter("Supplier",      FilterOperator.Contains, sQuery)
+            new Filter("PurchaseOrder", FilterOperator.Contains, sSearch),
+            new Filter("Supplier",      FilterOperator.Contains, sSearch)
           ],
           and: false
         }));
       }
-      oBinding.filter(aFilters);
+      if (sStatus)   { aFilters.push(new Filter("PurchasingProcessingStatus", FilterOperator.EQ, sStatus)); }
+      if (sPurchOrg) { aFilters.push(new Filter("PurchasingOrganization",     FilterOperator.EQ, sPurchOrg)); }
+      if (sCompany)  { aFilters.push(new Filter("CompanyCode",                FilterOperator.EQ, sCompany)); }
+
+      this.byId("ordersTable").getBinding("items")
+        .filter(aFilters.length ? new Filter({ filters: aFilters, and: true }) : []);
     },
 
     onOrderPress: function (oEvent) {
-      // Read the PurchaseOrder key from the OData binding context
-      var sId = oEvent.getSource()
-                      .getBindingContext()
-                      .getProperty("PurchaseOrder");
-
-      // Navigate via router — Detail controller picks it up
+      var sId = oEvent.getSource().getBindingContext().getProperty("PurchaseOrder");
       this.getOwnerComponent().getRouter().navTo("detail", { id: sId });
+    },
+
+    onExportPress: function () {
+      var aItems = this.byId("ordersTable").getItems();
+      if (!aItems.length) { MessageToast.show("Keine Daten zum Exportieren."); return; }
+
+      var sCSV = "Bestellnummer,Lieferant,Status,Einkaufsorg.,Buchungskreis,Währung,Gesamtbetrag\n";
+      aItems.forEach(function (oItem) {
+        var o = oItem.getBindingContext();
+        sCSV += [
+          o.getProperty("PurchaseOrder"),
+          o.getProperty("Supplier"),
+          STATUS_TEXT[o.getProperty("PurchasingProcessingStatus")] || o.getProperty("PurchasingProcessingStatus"),
+          o.getProperty("PurchasingOrganization"),
+          o.getProperty("CompanyCode"),
+          o.getProperty("DocumentCurrency"),
+          o.getProperty("PurgReleaseTimeTotalAmount")
+        ].join(",") + "\n";
+      });
+
+      var oLink = document.createElement("a");
+      oLink.href = URL.createObjectURL(new Blob([sCSV], { type: "text/csv;charset=utf-8;" }));
+      oLink.download = "bestellungen.csv";
+      oLink.click();
+      MessageToast.show("Export erfolgreich!");
     }
 
   });

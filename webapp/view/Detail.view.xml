@@ -7,50 +7,76 @@
 
   <Page
     id="detailPage"
-    title="{PurchaseOrder}"
+    title="Bestellung {PurchaseOrder}"
     showNavButton="true"
     navButtonPress=".onNavBack">
 
     <headerContent>
-      <Button text="Genehmigen" type="Accept"  press=".onApprove"
-        visible="{viewModel>/canAct}"/>
-      <Button text="Ablehnen"   type="Reject"  press=".onReject"
-        visible="{viewModel>/canAct}"/>
+      <Button text="Genehmigen" type="Accept" press=".onApprove"
+        visible="{viewModel>/canAct}" />
+      <Button text="Ablehnen" type="Reject" press=".onReject"
+        visible="{viewModel>/canAct}" />
     </headerContent>
 
     <content>
       <Panel headerText="Allgemeine Informationen" class="sapUiMediumMargin">
         <content>
-          <form:SimpleForm editable="false" layout="ResponsiveGridLayout">
+          <form:SimpleForm editable="false" layout="ResponsiveGridLayout"
+            labelSpanL="4" labelSpanM="4" columnsL="2" columnsM="2">
             <form:content>
-              <Label text="Bestellnummer"/>
-              <Text text="{PurchaseOrder}"/>
+              <Label text="Bestellnummer" />
+              <Text text="{PurchaseOrder}" />
 
-              <Label text="Lieferant"/>
-              <Text text="{Supplier}"/>
+              <Label text="Bestelltyp" />
+              <Text text="{PurchaseOrderType}" />
 
-              <Label text="Status"/>
+              <Label text="Lieferant" />
+              <Text text="{Supplier}" />
+
+              <Label text="Status" />
               <ObjectStatus
-                text="{PurchasingProcessingStatus}"
-                state="{viewModel>/statusState}"/>
+                text="{path: 'PurchasingProcessingStatus', formatter: '.formatStatusText'}"
+                state="{path: 'PurchasingProcessingStatus', formatter: '.formatStatusState'}" />
 
-              <Label text="Bestelldatum"/>
-              <Text text="{PurchaseOrderDate}"/>
+              <Label text="Bestelldatum" />
+              <Text text="{path: 'PurchaseOrderDate', formatter: '.formatDate'}" />
 
-              <Label text="Erstellt am"/>
-              <Text text="{CreationDate}"/>
+              <Label text="Erstellt am" />
+              <Text text="{path: 'CreationDate', formatter: '.formatDate'}" />
 
-              <Label text="Erstellt von"/>
-              <Text text="{CreatedByUser}"/>
+              <Label text="Erstellt von" />
+              <Text text="{CreatedByUser}" />
 
-              <Label text="Buchungskreis"/>
-              <Text text="{CompanyCode}"/>
+              <Label text="Gesamtbetrag" />
+              <Text
+                text="{parts: [{path: 'PurgReleaseTimeTotalAmount'},{path: 'DocumentCurrency'}], formatter: '.formatAmount'}" />
+            </form:content>
+          </form:SimpleForm>
+        </content>
+      </Panel>
 
-              <Label text="Einkaufsorg."/>
-              <Text text="{PurchasingOrganization}"/>
+      <Panel headerText="Organisationsdaten" class="sapUiMediumMargin">
+        <content>
+          <form:SimpleForm editable="false" layout="ResponsiveGridLayout"
+            labelSpanL="4" labelSpanM="4" columnsL="2" columnsM="2">
+            <form:content>
+              <Label text="Buchungskreis" />
+              <Text text="{CompanyCode}" />
 
-              <Label text="Einkäufergrp."/>
-              <Text text="{PurchasingGroup}"/>
+              <Label text="Einkaufsorg." />
+              <Text text="{PurchasingOrganization}" />
+
+              <Label text="Einkäufergruppe" />
+              <Text text="{PurchasingGroup}" />
+
+              <Label text="Währung" />
+              <Text text="{DocumentCurrency}" />
+
+              <Label text="Zahlungsbedingung" />
+              <Text text="{PaymentTerms}" />
+
+              <Label text="Skonto 1 (Tage)" />
+              <Text text="{CashDiscount1Days}" />
             </form:content>
           </form:SimpleForm>
         </content>
