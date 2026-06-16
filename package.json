@@ -10,7 +10,8 @@
     "build": "ui5 build -a --clean-dest --include-task=generateCachebusterInfo",
     "deploy": "fiori verify",
     "deploy-config": "fiori add deploy-config",
-    "start-mock": "fiori run --open \"test/flpSandboxMockServer.html?sap-ui-xx-viewCache=false#app-tile\""
+    "start-mock": "fiori run --open \"test/flpSandboxMockServer.html?sap-ui-xx-viewCache=false#app-tile\"",
+    "test": "fiori run --open \"test/unit/unitTests.qunit.html\""
   },
   "devDependencies": {
     "@sap/ux-ui5-tooling": "1",

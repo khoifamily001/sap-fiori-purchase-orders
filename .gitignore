@@ -10,6 +10,7 @@ mta_archives/
 mta-*
 Makefile*.mta
 .*_mta_build_tmp
+claude.md
 
 # Local overrides only
 ui5-local.yaml
@@ -20,3 +21,4 @@ package-lock.json
 
 # Environment secrets
 .env
+
